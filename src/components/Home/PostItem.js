@@ -1,37 +1,52 @@
-import React from "react";
+  
+import React, { useEffect , useState } from 'react';
 import "./PostItem.css";
+import { fetchData } from '../../api';
 import { Link } from "react-router-dom";
 
-function PostItem(props) {
-  const { post } = props;
-  const title = post.title
-  const link = title.toLowerCase().replaceAll(" ", "-")
+function PostItem({handlecomment}) {
+  const [fetchposts,setfetchposts]=useState([]);
+
+    useEffect(()=>{
+        const fetchpost=async ()=>
+        {
+            setfetchposts(await fetchData());
+        }
+        fetchpost();
+    },[])
+    console.log(fetchposts);
   return (
-    <div className="post">
-      <div className="post__left">
-        <i className="fas fa-caret-up"></i>
-        <span>{post.upvote}</span>
-        <i className="fas fa-caret-down"></i>
+    <>
+      <h1 id='not_login'>LOGIN PLEASE</h1>
+      <div className='post_home_area' id='allposts'>
+        {fetchposts&&fetchposts.map((posts) => (
+          <div className='post'>
+            <div className='post__right'>
+              <span className='s1'>{posts.user}</span>
+              <br></br>
+              <span className='s2'>PostId:{posts.postId}</span>
+              <br></br>
+              <br></br>
+              <h3 className='t1'>
+                <u>{posts.postTitle}</u>
+              </h3>
+              <br></br>
+              <span className='post__info'>{posts.postDesc}</span>
+              <Link to='/comments'>
+                <button
+                  class='button'
+                  onClick={(e) => handlecomment(e.target.value)}
+                  value={posts.postId}>
+                  Comment
+                </button>
+              </Link>
+            </div>
+          </div>
+        ))}
       </div>
-      <div className="post__center">
-        <img src={post.image} alt="" />
-      </div>
-      <div className="post__right">
-        <h3><Link to={`/${post.subreddit}/${link}`}>{post.title} </Link></h3>
-        <span className="post__info">
-          submitted an hour ago by
-          <Link to={`/u/${post.user}`}> {post.user}</Link> to{" "}
-          <Link to={`/r/${post.subreddit}`}> {post.subreddit}</Link>
-        </span>
-        <p className="post__info">
-          <Link to={`/${post.subreddit}/${link}/comments`}>
-            {post.comments_count} comments
-          </Link>{" "}
-          | share | save | hide | report
-        </p>
-      </div>
-    </div>
+    </>
   );
 }
+
 
 export default PostItem;
